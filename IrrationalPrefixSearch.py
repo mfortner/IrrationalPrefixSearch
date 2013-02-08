@@ -28,7 +28,7 @@ class IrrationalPrefixSearch(object):
 					curr = self.source.read(1)
 					curr_off+=1
 				if not curr:
-					print "File ended at digit "+(i+1)
+					print "File ended at digit "+str(i+1)
 					break
 				if curr == first:
 					location = i
