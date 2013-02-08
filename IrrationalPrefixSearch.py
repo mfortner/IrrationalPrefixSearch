@@ -1,13 +1,24 @@
 import sys
+import signal
 
 class IrrationalPrefixSearch(object):
 
 	def __init__(self, source):
 		self.source = open(source, "r")
 		self.digits = ["0","1","2","3","4","5","6","7","8","9"]
+		signal.signal(signal.SIGINT, self.abort)
 
 	def __del__(self):
 		self.source.close()
+	def abort(self, signum, frame):
+		result = frame.f_locals["result"]
+		best = frame.f_locals["best"]
+		off = frame.f_locals["offset"]
+		i = frame.f_locals["i"]
+		print off
+		self.show(result, best, i+1, off, 5)
+		sys.exit()
+
 
 	def find_longest(self, t, n):
 		"""Find the longest prefix of target within the first n digits
@@ -47,13 +58,12 @@ class IrrationalPrefixSearch(object):
 						offset = curr_off
 					target.seek(first_loc+1)
 					self.source.seek(location+curr_off+1)
-		print (result, best, offset)
-		return (result, best, offset)
+		return (result, best, n, offset)
 
-	def show(self, index, n, offest, margin):
+	def show(self, index, n, i, offset, margin):
 		start = max(0, index+offset-margin)
 		self.source.seek(start)
-		output = ""
+		output = "Longest prefix in first " + str(i) + " digits was found \n at index " + str(index) + " :  "
 		output+=self.source.read(min(margin,index+offset))
 		output+=" [ "
 		count=0
@@ -80,5 +90,5 @@ if __name__=="__main__":
 	n = int(sys.argv[3])
 
 	ips = IrrationalPrefixSearch(source)
-	(index, length, offset) = ips.find_longest(target, n)
-	ips.show(index, length, offset, 5)
+	(index, length, i, offset) = ips.find_longest(target, n)
+	ips.show(index, length, i, offset, 5)
